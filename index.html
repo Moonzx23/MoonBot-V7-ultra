@@ -1,0 +1,1008 @@
+```html
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MoonBot V7 Ultra</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;font-family:Consolas,monospace;background:#020409;color:#d9fbff}
+body{overflow:hidden}
+
+/* ================= INTRO ================= */
+
+#intro{
+ position:fixed;inset:0;z-index:9999;
+ display:flex;align-items:center;justify-content:center;
+ text-align:center;
+ background:
+ radial-gradient(circle at center,#071923 0%,#020409 48%,#000 100%);
+}
+
+.introBox{width:min(900px,92vw)}
+
+.moon{
+ width:110px;height:110px;border-radius:50%;
+ margin:0 auto 24px;
+ background:linear-gradient(145deg,#fff,#a6f5ff 55%,#287987);
+ box-shadow:0 0 25px #00eaff,0 0 80px rgba(0,234,255,.28);
+ animation:pulse 2s infinite alternate;
+}
+
+@keyframes pulse{
+ from{transform:scale(.96);filter:brightness(.8)}
+ to{transform:scale(1.05);filter:brightness(1.25)}
+}
+
+#systemText{
+ min-height:230px;
+ line-height:1.65;
+ font-size:14px;
+ text-shadow:0 0 8px rgba(0,234,255,.7);
+}
+
+.info{color:#00eaff}
+.warning{color:#ff5470}
+.ok{color:#67ff9c}
+
+.glitch{
+ font-size:42px;
+ font-weight:bold;
+ letter-spacing:4px;
+ text-shadow:2px 0 #ff315c,-2px 0 #00eaff;
+ animation:glitch .7s infinite;
+}
+
+@keyframes glitch{
+ 0%,100%{transform:translate(0)}
+ 20%{transform:translate(2px,-1px)}
+ 40%{transform:translate(-2px,1px)}
+ 60%{transform:translate(1px,2px)}
+ 80%{transform:translate(-1px,-1px)}
+}
+
+.progressWrap{
+ width:100%;height:8px;
+ background:#071017;border:1px solid #00eaff;
+ margin:20px 0;
+}
+
+#progress{
+ width:0%;height:100%;
+ background:#00eaff;
+ box-shadow:0 0 15px #00eaff;
+ transition:.2s;
+}
+
+#enter{
+ display:none;
+ margin:22px auto;
+ padding:14px 35px;
+ background:transparent;
+ color:#00eaff;
+ border:1px solid #00eaff;
+ font-family:inherit;
+ font-weight:bold;
+ cursor:pointer;
+ box-shadow:0 0 15px rgba(0,234,255,.3);
+}
+
+#enter:hover{
+ background:#00eaff;color:#001014;
+ box-shadow:0 0 30px #00eaff;
+}
+
+/* ================= APP ================= */
+
+#app{display:none;height:100vh}
+
+header{
+ height:64px;
+ display:flex;
+ align-items:center;
+ padding:0 20px;
+ border-bottom:1px solid #12313a;
+ background:#050a0f;
+}
+
+.logo{
+ font-size:21px;
+ font-weight:bold;
+ text-shadow:0 0 12px #00eaff;
+}
+
+.status{
+ margin-left:auto;
+ color:#67ff9c;
+ font-size:12px;
+}
+
+main{
+ display:flex;
+ height:calc(100vh - 64px);
+}
+
+aside{
+ width:225px;
+ padding:15px;
+ background:#04080c;
+ border-right:1px solid #12313a;
+}
+
+.sideTitle{
+ color:#00eaff;
+ font-size:12px;
+ margin:8px 0 14px;
+}
+
+.sideBtn{
+ width:100%;
+ padding:11px;
+ margin-bottom:9px;
+ background:#071017;
+ color:#c9faff;
+ border:1px solid #12313a;
+ cursor:pointer;
+ font-family:inherit;
+}
+
+.sideBtn:hover{
+ border-color:#00eaff;
+ box-shadow:0 0 10px rgba(0,234,255,.25);
+}
+
+.chat{
+ flex:1;
+ display:flex;
+ flex-direction:column;
+ min-width:0;
+}
+
+#messages{
+ flex:1;
+ overflow:auto;
+ padding:24px;
+}
+
+.msg{
+ max-width:900px;
+ margin:0 auto 15px;
+ padding:13px 16px;
+ background:#061017;
+ border-left:2px solid #00eaff;
+ line-height:1.6;
+ white-space:pre-wrap;
+}
+
+.msg.user{
+ border-left-color:#9d7cff;
+}
+
+.label{
+ font-size:11px;
+ opacity:.7;
+ margin-bottom:5px;
+}
+
+.inputArea{
+ display:flex;
+ gap:10px;
+ padding:14px;
+ border-top:1px solid #12313a;
+ background:#04080c;
+}
+
+#input{
+ flex:1;
+ min-height:52px;
+ max-height:160px;
+ resize:none;
+ padding:14px;
+ background:#020509;
+ border:1px solid #16313a;
+ color:#fff;
+ outline:none;
+ font-family:inherit;
+}
+
+#send{
+ width:100px;
+ border:0;
+ background:#00eaff;
+ color:#001014;
+ font-weight:bold;
+ cursor:pointer;
+}
+
+#send:hover{filter:brightness(1.15)}
+
+@media(max-width:700px){
+ aside{display:none}
+ .glitch{font-size:29px}
+ #messages{padding:12px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= INTRO ================= -->
+
+<section id="intro">
+<div class="introBox">
+
+<div class="moon"></div>
+
+<div id="systemText"></div>
+
+<div class="progressWrap">
+<div id="progress"></div>
+</div>
+
+<div id="title" class="glitch"></div>
+
+<button id="enter">[ ENTER MOONBOT ]</button>
+
+</div>
+</section>
+
+<!-- ================= APP ================= -->
+
+<section id="app">
+
+<header>
+<div class="logo">🌙 MOONBOT V7 ULTRA</div>
+<div class="status">● ALL SYSTEMS ONLINE</div>
+</header>
+
+<main>
+
+<aside>
+
+<div class="sideTitle">MOON CORE</div>
+
+<button class="sideBtn" onclick="newChat()">＋ NEW CHAT</button>
+
+<button class="sideBtn" onclick="changeMode('Standard')">
+STANDARD
+</button>
+
+<button class="sideBtn" onclick="changeMode('Medium')">
+MEDIUM
+</button>
+
+<button class="sideBtn" onclick="changeMode('Fast')">
+FAST
+</button>
+
+<button class="sideBtn" onclick="showInfo()">
+MOON CORE INFO
+</button>
+
+</aside>
+
+<div class="chat">
+
+<div id="messages"></div>
+
+<div class="inputArea">
+<textarea id="input"
+placeholder="Tanya MoonBot apa-apa..."></textarea>
+<button id="send">SEND</button>
+</div>
+
+</div>
+
+</main>
+</section>
+
+<script>
+
+/* =========================================================
+   MOONBOT V7 ULTRA BRAIN
+   ========================================================= */
+
+const intro=document.getElementById("intro");
+const app=document.getElementById("app");
+const systemText=document.getElementById("systemText");
+const progress=document.getElementById("progress");
+const title=document.getElementById("title");
+const enter=document.getElementById("enter");
+
+const introSequence=[
+
+["MOONBOT V7 ULTRA INITIALIZING...","info"],
+["MOON CORE DETECTED","info"],
+["SCANNING SYSTEM ARCHITECTURE...","info"],
+["ANALYSING NEURAL ENGINE...","info"],
+["LOADING KNOWLEDGE MATRIX...","info"],
+
+["⚠ SYSTEM PROBLEM DETECTED","warning"],
+["⚠ CONNECTION UNSTABLE","warning"],
+["⚠ NEURAL CORE ERROR","warning"],
+["⚠ MEMORY SYSTEM ERROR","warning"],
+["⚠ SECURITY LAYER FAILURE","warning"],
+["⚠ UNKNOWN SIGNAL DETECTED","warning"],
+["⚠ SYSTEM DESTABILIZED","warning"],
+
+["// CONNECTION LOST","warning"],
+["// EMERGENCY REBOOT","warning"],
+["REBUILDING MOON CORE...","info"],
+["RESTORING NEURAL ENGINE...","info"],
+["RESTORING MEMORY SYSTEM...","info"],
+["RESTORING KNOWLEDGE ENGINE...","info"],
+["RESTORING LANGUAGE ENGINE...","info"],
+
+["✓ MOON CORE RESTORED","ok"],
+["✓ NEURAL ENGINE ONLINE","ok"],
+["✓ MEMORY SYSTEM ONLINE","ok"],
+["✓ KNOWLEDGE ENGINE ONLINE","ok"],
+["✓ LANGUAGE ENGINE ONLINE","ok"],
+["✓ MATH ENGINE ONLINE","ok"],
+["✓ RESPONSE ENGINE ONLINE","ok"],
+["✓ MOONBOT V7 ULTRA READY","ok"],
+["SYSTEM ONLINE","ok"]
+
+];
+
+let introIndex=0;
+
+function runIntro(){
+
+ if(introIndex<introSequence.length){
+
+   const [line,type]=introSequence[introIndex];
+
+   const div=document.createElement("div");
+   div.className=type;
+   div.textContent=line;
+
+   systemText.appendChild(div);
+
+   progress.style.width=
+   ((introIndex+1)/introSequence.length*100)+"%";
+
+   introIndex++;
+
+   setTimeout(runIntro,180);
+
+ }else{
+
+   setTimeout(()=>{
+
+     title.textContent="MOONBOT V7";
+
+     enter.style.display="block";
+
+   },500);
+ }
+}
+
+runIntro();
+
+enter.onclick=()=>{
+
+ intro.style.display="none";
+ app.style.display="block";
+
+ addBot(
+ "MoonBot V7 Ultra berjaya online. 🌙\n\n"+
+ "Neural engine: ONLINE\n"+
+ "Knowledge engine: ONLINE\n"+
+ "Math engine: ONLINE\n"+
+ "Language engine: ONLINE\n\n"+
+ "Apa yang kau nak tanya?"
+ );
+
+};
+
+/* =========================================================
+   BASIC ENGINE
+   ========================================================= */
+
+const messages=document.getElementById("messages");
+const input=document.getElementById("input");
+const send=document.getElementById("send");
+
+let mode="Standard";
+let mood="Biasa";
+
+function escapeHTML(str){
+
+ return str.replace(/[&<>"']/g,char=>({
+
+ "&":"&amp;",
+ "<":"&lt;",
+ ">":"&gt;",
+ '"':"&quot;",
+ "'":"&#039;"
+
+ }[char]));
+
+}
+
+function addBot(text){
+
+ const div=document.createElement("div");
+
+ div.className="msg";
+
+ div.innerHTML=
+ `<div class="label">🌙 MOONBOT V7 ULTRA</div>`+
+ escapeHTML(text);
+
+ messages.appendChild(div);
+ messages.scrollTop=messages.scrollHeight;
+
+}
+
+function addUser(text){
+
+ const div=document.createElement("div");
+
+ div.className="msg user";
+
+ div.innerHTML=
+ `<div class="label">YOU</div>`+
+ escapeHTML(text);
+
+ messages.appendChild(div);
+ messages.scrollTop=messages.scrollHeight;
+
+}
+
+/* =========================================================
+   SLANG NORMALIZER
+   ========================================================= */
+
+function normalize(text){
+
+ return text
+ .toLowerCase()
+ .replace(/[!?.,;:]+/g," ")
+ .replace(/\bnk\b/g,"nak")
+ .replace(/\btk\b/g,"tak")
+ .replace(/\btakde\b/g,"tak ada")
+ .replace(/\btkde\b/g,"tak ada")
+ .replace(/\bxde\b/g,"tak ada")
+ .replace(/\bdh\b/g,"dah")
+ .replace(/\byg\b/g,"yang")
+ .replace(/\bdgn\b/g,"dengan")
+ .replace(/\bkat\b/g,"di")
+ .replace(/\borg\b/g,"orang")
+ .replace(/\bkwn\b/g,"kawan")
+ .replace(/\bklu\b/g,"kalau")
+ .replace(/\bmcm\b/g,"macam")
+ .replace(/\bape\b/g,"apa")
+ .replace(/\bsape\b/g,"siapa")
+ .replace(/\bcamne\b/g,"macam mana")
+ .replace(/\bbg\b/g,"bagi")
+ .replace(/\bbgi\b/g,"bagi")
+ .replace(/\bblh\b/g,"boleh")
+ .replace(/\btakleh\b/g,"tak boleh")
+ .replace(/\bxleh\b/g,"tak boleh")
+ .replace(/\bskrg\b/g,"sekarang")
+ .replace(/\bsbb\b/g,"sebab")
+ .replace(/\bmkn\b/g,"makan")
+ .replace(/\btgh\b/g,"tengah")
+ .replace(/\bdkt\b/g,"dekat")
+ .replace(/\bnkbuat\b/g,"nak buat");
+
+}
+
+/* =========================================================
+   MATH ENGINE
+   ========================================================= */
+
+function calculateMath(q){
+
+ let expression=q
+ .replace(/berapa|kira|jawab|sama dengan/g,"")
+ .replace(/darab/g,"*")
+ .replace(/tambah/g,"+")
+ .replace(/tolak/g,"-")
+ .replace(/bahagi/g,"/")
+ .replace(/×/g,"*")
+ .replace(/÷/g,"/")
+ .replace(/x/g,"*")
+ .trim();
+
+ const percent=
+ expression.match(/(\d+(?:\.\d+)?)\s*%\s*(?:daripada|of)\s*(\d+(?:\.\d+)?)/);
+
+ if(percent){
+
+   const a=Number(percent[1]);
+   const b=Number(percent[2]);
+
+   return String((a/100)*b);
+
+ }
+
+ const ratio=
+ expression.match(/(\d+(?:\.\d+)?)\s+daripada\s+(\d+(?:\.\d+)?)/);
+
+ if(ratio){
+
+   const a=Number(ratio[1]);
+   const b=Number(ratio[2]);
+
+   return ((a/b)*100).toFixed(2)+"%";
+
+ }
+
+ if(!/^[0-9+\-*/().%\s]+$/.test(expression))
+ return null;
+
+ try{
+
+   if(!/[+\-*/]/.test(expression))
+   return null;
+
+   const result=Function('"use strict";return ('+expression+')')();
+
+   if(Number.isFinite(result))
+   return String(result);
+
+ }catch(e){}
+
+ return null;
+
+}
+
+/* =========================================================
+   KNOWLEDGE BASE
+   ========================================================= */
+
+const knowledge={
+
+ malaysia:{
+
+  keywords:[
+   "malaysia","negeri malaysia","wilayah persekutuan",
+   "ibu negara","putrajaya","tunku abdul rahman",
+   "hari merdeka","hari malaysia"
+  ],
+
+  answer:
+  "Malaysia mempunyai 13 negeri dan 3 Wilayah Persekutuan. "+
+  "Kuala Lumpur ialah ibu negara, manakala Putrajaya ialah pusat pentadbiran Persekutuan. "+
+  "Tunku Abdul Rahman ialah Perdana Menteri pertama Malaysia."
+
+ },
+
+ history:{
+
+  keywords:[
+   "sejarah","tun perak","kesultanan melaka",
+   "parameswara","sultan mansur shah",
+   "bendahara","melaka diasaskan"
+  ],
+
+  answer:
+  "Antara topik penting Sejarah Malaysia ialah Kesultanan Melayu Melaka. "+
+  "Parameswara sering dikaitkan dengan pengasasan Melaka. "+
+  "Tun Perak pula merupakan bendahara terkenal pada zaman Kesultanan Melaka."
+
+ },
+
+ science:{
+
+  keywords:[
+   "sains","fotosintesis","graviti","planet",
+   "jupiter","marikh","air mendidih",
+   "tumbuhan","sel"
+  ],
+
+  answer:
+  "Fotosintesis ialah proses tumbuhan menghasilkan makanan menggunakan cahaya, air dan karbon dioksida. "+
+  "Jupiter ialah planet terbesar dalam Sistem Suria. "+
+  "Graviti ialah daya tarikan antara objek yang mempunyai jisim."
+
+ },
+
+ geography:{
+
+  keywords:[
+   "geografi","asia","kinabalu","sungai rajang",
+   "gunung tertinggi","benua"
+  ],
+
+  answer:
+  "Malaysia terletak di Asia Tenggara. Gunung Kinabalu merupakan gunung tertinggi di Malaysia, "+
+  "manakala Sungai Rajang ialah sungai terpanjang di Malaysia."
+
+ },
+
+ bm:{
+
+  keywords:[
+   "bahasa melayu","kata nafi","kata hubung",
+   "peribahasa","kata nama","kata kerja",
+   "kata adjektif"
+  ],
+
+  answer:
+  "Kata nafi utama ialah 'tidak' dan 'bukan'. "+
+  "Kata hubung menghubungkan perkataan atau ayat seperti dan, tetapi, kerana, atau dan sambil. "+
+  "Kata nama menamakan orang, tempat, benda atau perkara."
+
+ },
+
+ english:{
+
+  keywords:[
+   "english","kata kerja english","noun","verb",
+   "adjective","grammar"
+  ],
+
+  answer:
+  "Dalam English, noun ialah kata nama, verb ialah kata kerja dan adjective ialah kata sifat."
+
+ },
+
+ coding:{
+
+  keywords:[
+   "coding","html","css","javascript","python",
+   "programming","program"
+  ],
+
+  answer:
+  "HTML membina struktur halaman web. CSS mengawal gaya dan reka bentuk. "+
+  "JavaScript menambah interaksi. Python ialah bahasa pengaturcaraan serba guna."
+
+ },
+
+ sports:{
+
+  keywords:[
+   "bola sepak","football","ronaldo","sukan",
+   "olahraga","200m","futsal","takraw",
+   "handball","silat"
+  ],
+
+  answer:
+  "Bola sepak dimainkan oleh dua pasukan dan objektifnya ialah menjaringkan gol. "+
+  "Olahraga merangkumi acara seperti larian, lompatan dan balingan."
+
+ },
+
+ pksk:{
+
+  keywords:[
+   "pksk","smka","sbp","asrama",
+   "karangan pksk","pentaksiran kemasukan"
+  ],
+
+  answer:
+  "PKSK ialah Pentaksiran Kemasukan Sekolah Khusus. "+
+  "Untuk latihan, kau boleh fokus pada pengetahuan am, akademik, Bahasa Melayu, "+
+  "pemahaman, logik dan penulisan mengikut format yang diminta."
+
+ },
+
+ languages:{
+
+  keywords:[
+   "bahasa sepanyol","spanish","jepun","japanese",
+   "korea","korean","perancis","french",
+   "hola","bonjour","konnichiwa"
+  ],
+
+  answer:
+  "Contoh mudah: Spanish = Hola, Japanese = Konnichiwa, "+
+  "Korean = Annyeonghaseyo, French = Bonjour."
+
+ }
+
+};
+
+/* =========================================================
+   CREATOR / MOONBOT KNOWLEDGE
+   ========================================================= */
+
+function creatorKnowledge(q){
+
+ if(
+  q.includes("siapa cipta moonbot") ||
+  q.includes("siapa pencipta moonbot") ||
+  q.includes("siapa buat moonbot") ||
+  q.includes("creator moonbot")
+ )
+ return "MoonBot ialah projek AI/web yang dicipta oleh Nazreel pada tahun 2026.";
+
+ if(
+  q.includes("moonbot dibuat bila") ||
+  q.includes("bila moonbot dibuat")
+ )
+ return "MoonBot bermula sebagai projek Nazreel pada tahun 2026 dan berkembang melalui beberapa versi.";
+
+ if(q.includes("versi moonbot"))
+ return "MoonBot telah berkembang melalui beberapa versi seperti V4, V5, V6 dan kini V7 Ultra.";
+
+ if(q.includes("teknologi moonbot"))
+ return "Versi ini menggunakan HTML, CSS dan JavaScript dalam satu fail index.html.";
+
+ return null;
+
+}
+
+/* =========================================================
+   GREETING ENGINE
+   ========================================================= */
+
+function greeting(q){
+
+ if(
+  q==="hai" ||
+  q==="hello" ||
+  q==="helo" ||
+  q==="hi" ||
+  q.includes("selamat pagi") ||
+  q.includes("selamat malam")
+ )
+ return "Hai bro 😎🌙 MoonBot V7 Ultra online. Apa soalan kau?";
+
+ if(q.includes("terima kasih") || q.includes("thanks"))
+ return "Sama-sama bro 😎🌙";
+
+ if(q.includes("apa khabar"))
+ return "Aku okay dan semua sistem Moon Core sedang online. ⚡";
+
+ return null;
+
+}
+
+/* =========================================================
+   GENERAL FACTS
+   ========================================================= */
+
+function generalFacts(q){
+
+ if(q.includes("siapa ronaldo"))
+ return "Cristiano Ronaldo ialah pemain bola sepak profesional dari Portugal.";
+
+ if(q.includes("apa itu haiwan"))
+ return "Haiwan ialah organisma hidup yang memperoleh tenaga daripada makanan dan biasanya boleh bergerak serta memberi tindak balas terhadap persekitaran.";
+
+ if(q.includes("apa itu batu"))
+ return "Batu ialah bahan pepejal semula jadi yang terdiri daripada satu atau lebih mineral.";
+
+ if(q.includes("siapa cikgu"))
+ return "Cikgu ialah orang yang mengajar dan membimbing murid dalam pembelajaran.";
+
+ if(q.includes("siapa tunku abdul rahman"))
+ return "Tunku Abdul Rahman Putra Al-Haj ialah Perdana Menteri pertama Persekutuan Tanah Melayu dan kemudian Malaysia.";
+
+ if(q.includes("planet terbesar"))
+ return "Jupiter ialah planet terbesar dalam Sistem Suria.";
+
+ if(q.includes("air mendidih"))
+ return "Pada tekanan atmosfera standard, air mendidih pada sekitar 100°C.";
+
+ return null;
+
+}
+
+/* =========================================================
+   MOOD / MODE
+   ========================================================= */
+
+function modeReply(){
+
+ if(mode==="Fast")
+ return "⚡ Fast mode aktif — jawapan ringkas.";
+
+ if(mode==="Medium")
+ return "🧠 Medium mode aktif — jawapan lebih lengkap.";
+
+ return "🌙 Standard mode aktif.";
+
+}
+
+/* =========================================================
+   MAIN BRAIN
+   ========================================================= */
+
+function getAnswer(original){
+
+ const q=normalize(original);
+
+ if(!q) return "Taip sesuatu dulu bro 😎";
+
+ const greet=greeting(q);
+ if(greet)return greet;
+
+ const creator=creatorKnowledge(q);
+ if(creator)return creator;
+
+ const fact=generalFacts(q);
+ if(fact)return fact;
+
+ const math=calculateMath(q);
+
+ if(math!==null)
+ return "🧮 Jawapan: "+math;
+
+ if(q.includes("mode"))
+ return modeReply();
+
+ for(const key in knowledge){
+
+   const item=knowledge[key];
+
+   for(const word of item.keywords){
+
+     if(q.includes(word))
+     return item.answer;
+
+   }
+ }
+
+ if(
+  q.includes("siapa kau") ||
+  q.includes("apa itu moonbot") ||
+  q.includes("kau siapa")
+ )
+ return "Aku MoonBot V7 Ultra 🌙, chatbot web yang dibangunkan sebagai projek Nazreel pada tahun 2026.";
+
+ if(
+  q.includes("pandai") ||
+  q.includes("bijak")
+ )
+ return "Aku direka dengan knowledge base, normalizer Bahasa Melayu, math engine, topic engine dan conversation engine. Tapi aku masih bukan model AI cloud sebenar.";
+
+ if(
+  q.includes("boleh buat apa")
+ )
+ return "Aku boleh bantu dengan Math, BM, English, Sains, Sejarah, Geografi, Malaysia, PKSK, coding, sukan, bahasa dan soalan umum yang ada dalam knowledge base.";
+
+ if(
+  q.includes("marah")
+ )
+ return "Aku tak marah bro 😂 Moon Core masih stabil.";
+
+ if(
+  q.includes("sedih")
+ )
+ return "Kalau tengah sedih, rehat sekejap dan buat benda yang kau suka. 🌙";
+
+ return fallback(q);
+
+}
+
+/* =========================================================
+   FALLBACK
+   ========================================================= */
+
+function fallback(q){
+
+ const responses=[
+
+ "Aku belum ada maklumat khusus tentang soalan itu dalam knowledge base V7 Ultra.",
+
+ "Moon Core faham soalan kau, tetapi knowledge module untuk topik itu belum tersedia.",
+
+ "Soalan menarik 👀. Untuk jawapan yang benar-benar luas dan terkini, MoonBot perlukan backend AI sebenar atau API model AI.",
+
+ "Aku boleh cuba jawab jika soalan itu berkaitan Math, Sains, Sejarah, Geografi, BM, English, coding, Malaysia, PKSK atau sukan."
+
+ ];
+
+ return responses[Math.floor(Math.random()*responses.length)];
+
+}
+
+/* =========================================================
+   SEND SYSTEM
+   ========================================================= */
+
+function sendMessage(){
+
+ const value=input.value.trim();
+
+ if(!value)return;
+
+ addUser(value);
+
+ input.value="";
+
+ setTimeout(()=>{
+
+   const response=getAnswer(value);
+
+   addBot(response);
+
+ },250);
+
+}
+
+send.onclick=sendMessage;
+
+input.addEventListener("keydown",e=>{
+
+ if(e.key==="Enter" && !e.shiftKey){
+
+   e.preventDefault();
+
+   sendMessage();
+
+ }
+
+});
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+function newChat(){
+
+ messages.innerHTML="";
+
+ addBot(
+ "Chat baharu dimulakan. 🌙\n"+
+ "Moon Core V7 Ultra sedia menerima soalan."
+ );
+
+}
+
+function changeMode(newMode){
+
+ mode=newMode;
+
+ addBot("Mode ditukar kepada "+newMode+".");
+
+}
+
+function showInfo(){
+
+ addBot(
+ "🌙 MOON CORE V7 ULTRA\n\n"+
+ "Neural Engine: ONLINE\n"+
+ "Knowledge Engine: ONLINE\n"+
+ "Math Engine: ONLINE\n"+
+ "Language Engine: ONLINE\n"+
+ "Memory: SESSION ACTIVE\n"+
+ "Voice: DISABLED\n"+
+ "Creator: Nazreel\n"+
+ "Year: 2026"
+ );
+
+}
+
+/* =========================================================
+   LOCAL CHAT MEMORY
+   ========================================================= */
+
+const STORAGE_KEY="moonbot_v7_chat";
+
+function saveChat(){
+
+ localStorage.setItem(
+  STORAGE_KEY,
+  messages.innerHTML
+ );
+
+}
+
+function loadChat(){
+
+ const saved=localStorage.getItem(STORAGE_KEY);
+
+ if(saved)
+ messages.innerHTML=saved;
+
+}
+
+setInterval(saveChat,1000);
+
+loadChat();
+
+</script>
+
+</body>
+</html>
+```
